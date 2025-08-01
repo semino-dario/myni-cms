@@ -1,0 +1,59 @@
+/* Global CMS Styles */
+:root {
+  --cms-primary: #2563eb;
+  --cms-secondary: #64748b;
+  --cms-success: #10b981;
+  --cms-warning: #f59e0b;
+  --cms-error: #ef4444;
+  --cms-background: #ffffff;
+  --cms-surface: #f8fafc;
+  --cms-border: #e2e8f0;
+  --cms-text: #1e293b;
+  --cms-text-muted: #64748b;
+}
+
+/* CMS Container */
+.cms-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: var(--cms-text);
+  background-color: var(--cms-background);
+  line-height: 1.5;
+}
+
+/* Basic reset for CMS components */
+.cms-container * {
+  box-sizing: border-box;
+}
+
+/* Typography */
+.cms-container h1,
+.cms-container h2,
+.cms-container h3,
+.cms-container h4,
+.cms-container h5,
+.cms-container h6 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.cms-container p {
+  margin: 0 0 1rem 0;
+}
+
+/* Utility classes */
+.cms-hidden {
+  display: none !important;
+}
+
+.cms-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
