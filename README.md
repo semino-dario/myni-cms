@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+⚠️ **Work in Progress** - This is an initial setup and active development project. Not ready for production use.
 
-## Getting Started
+An integrable CMS for Next.js that integrates directly into monolithic projects, not headless.
 
-First, run the development server:
+## 🚧 Current Status
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This repository contains the **initial project setup** and foundational structure. Core functionality is being actively developed.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**What's implemented:**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- ✅ Project structure and configuration
+- ✅ TypeScript setup with path aliases
+- ✅ Next.js 14+ integration
+- ✅ SASS configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**What's in development:**
 
-## Learn More
+- 🔄 Dynamic content-types system
+- 🔄 Database adapters (MongoDB/PostgreSQL)
+- 🔄 AWS S3 integration
+- 🔄 Administration panel
+- 🔄 Authentication system
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Planned Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Direct integration**: Integrates into your existing Next.js project, not headless
+- **Dynamic content-types**: Create and configure custom content types
+- **Flexible database**: Support for MongoDB and PostgreSQL
+- **Cloud storage**: AWS S3 integration for files and images
+- **TypeScript native**: Fully typed
+- **Updatable**: Can be updated without affecting your custom code
+- **Modular**: Completely separates CMS from your frontend application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+- **Framework**: Next.js 14+ with App Router
+- **Language**: TypeScript
+- **Styling**: SASS with CSS Modules
+- **Database**: MongoDB / PostgreSQL (planned)
+- **Storage**: AWS S3 (planned)
+- **Authentication**: JWT + bcrypt (planned)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+myni-cms/
+├── src/cms/ # CMS Core (auto-updated)
+├── user-content/ # Your custom code (safe zone)
+├── app/ # Next.js routes (developer zone)
+└── scripts/ # Installation and update scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📋 Development Roadmap
+
+- [ ] Modular configuration system
+- [ ] Dynamic content-types core
+- [ ] Database adapters implementation
+- [ ] Administration panel
+- [ ] File management with S3
+- [ ] Authentication system
+- [ ] Installation and update scripts
+- [ ] NPM publication
+
+## 📄 License
+
+MIT
+
+## 👨‍💻 Author
+
+Darío Semino
+
+Built with ❤️ to simplify content management in Next.js
