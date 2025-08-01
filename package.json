@@ -1,25 +1,46 @@
 {
-  "name": "myni-cms",
+  "name": "@semino-dario/myni-cms",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "cms:install": "node scripts/install.js",
+    "cms:update": "node scripts/update.js",
+    "cms:migrate": "node scripts/migrate.js",
+    "build:package": "tsc && cp -r src/cms dist/ && cp -r scripts dist/",
+    "prepublishOnly": "npm run build:package"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.858.0",
+    "@aws-sdk/s3-request-presigner": "^3.858.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/pg": "^8.15.5",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.0",
+    "multer": "^2.0.2",
+    "next": "15.4.5",
+    "pg": "^8.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.4.5"
+    "sass": "^1.89.2",
+    "sharp": "^0.34.3",
+    "slugify": "^1.6.6",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }
