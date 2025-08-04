@@ -1,5 +1,5 @@
-import { ContentTypeDefinition, ContentTypeRegistry } from '@cms/types';
-import { articleContentType } from './presets/article';
+import { ContentTypeDefinition, ContentTypeRegistry } from "@cms/types";
+import { articleContentType } from "./{presets}/article";
 
 // Content-types predefinidos del CMS
 const presetContentTypes: ContentTypeRegistry = {
@@ -10,7 +10,9 @@ const presetContentTypes: ContentTypeRegistry = {
 let userContentTypes: ContentTypeRegistry = {};
 
 // Función para registrar content-types del usuario
-export function registerUserContentTypes(contentTypes: ContentTypeRegistry): void {
+export function registerUserContentTypes(
+  contentTypes: ContentTypeRegistry
+): void {
   userContentTypes = { ...contentTypes };
 }
 
@@ -23,7 +25,9 @@ export function getAllContentTypes(): ContentTypeRegistry {
 }
 
 // Función para obtener un content-type específico
-export function getContentType(name: string): ContentTypeDefinition | undefined {
+export function getContentType(
+  name: string
+): ContentTypeDefinition | undefined {
   const allContentTypes = getAllContentTypes();
   return allContentTypes[name];
 }
@@ -34,26 +38,34 @@ export function getContentTypeNames(): string[] {
 }
 
 // Función para validar un content-type
-export function validateContentType(contentType: ContentTypeDefinition): string[] {
+export function validateContentType(
+  contentType: ContentTypeDefinition
+): string[] {
   const errors: string[] = [];
 
-  if (!contentType.name || typeof contentType.name !== 'string') {
-    errors.push('Content type name is required and must be a string');
+  if (!contentType.name || typeof contentType.name !== "string") {
+    errors.push("Content type name is required and must be a string");
   }
 
-  if (!contentType.displayName || typeof contentType.displayName !== 'string') {
-    errors.push('Content type displayName is required and must be a string');
+  if (!contentType.displayName || typeof contentType.displayName !== "string") {
+    errors.push("Content type displayName is required and must be a string");
   }
 
-  if (!contentType.fields || !Array.isArray(contentType.fields) || contentType.fields.length === 0) {
-    errors.push('Content type must have at least one field');
+  if (
+    !contentType.fields ||
+    !Array.isArray(contentType.fields) ||
+    contentType.fields.length === 0
+  ) {
+    errors.push("Content type must have at least one field");
   }
 
   // Validar campos únicos
-  const fieldNames = contentType.fields?.map(field => field.name) || [];
-  const duplicateFields = fieldNames.filter((name, index) => fieldNames.indexOf(name) !== index);
+  const fieldNames = contentType.fields?.map((field) => field.name) || [];
+  const duplicateFields = fieldNames.filter(
+    (name, index) => fieldNames.indexOf(name) !== index
+  );
   if (duplicateFields.length > 0) {
-    errors.push(`Duplicate field names found: ${duplicateFields.join(', ')}`);
+    errors.push(`Duplicate field names found: ${duplicateFields.join(", ")}`);
   }
 
   return errors;
