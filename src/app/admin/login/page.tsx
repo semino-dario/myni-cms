@@ -32,7 +32,16 @@ export default function LoginPage() {
     }
   };
 
+  // Demo credentials (these will be read from env vars on server side)
+  const demoCredentials = [
+    { email: 'demo.admin@example.test', password: 'demo_admin_pass_123', role: 'Admin' },
+    { email: 'demo.editor@example.test', password: 'demo_editor_pass_123', role: 'Editor' }
+  ];
+
   const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    
     setError('');
     setLoading(true);
 
@@ -106,22 +115,21 @@ export default function LoginPage() {
           <div className="login-demo">
             <h3>Quick Demo Access</h3>
             <div className="demo-accounts">
-              <button 
-                type="button"
-                onClick={() => handleDemoLogin('demo.admin@example.test', 'demo_admin_pass_123')}
-                className="demo-login-btn admin-btn"
-                disabled={loading}
-              >
-                {loading ? 'Logging in...' : 'Demo Admin Login'}
-              </button>
-              <button 
-                type="button"
-                onClick={() => handleDemoLogin('demo.editor@example.test', 'demo_editor_pass_123')}
-                className="demo-login-btn editor-btn"
-                disabled={loading}
-              >
-                {loading ? 'Logging in...' : 'Demo Editor Login'}
-              </button>
+              {demoCredentials.map((cred, index) => (
+                <div key={index} className="demo-account">
+                  <div className="demo-info">
+                    <strong>{cred.role}:</strong> {cred.email}
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => handleDemoLogin(cred.email, cred.password)}
+                    className={`demo-login-btn ${cred.role.toLowerCase()}-btn`}
+                    disabled={loading}
+                  >
+                    {loading ? 'Logging in...' : `Login as ${cred.role}`}
+                  </button>
+                </div>
+              ))}
             </div>
             <p className="demo-note">
               <strong>Development Only:</strong> These are demo credentials for testing the CMS functionality.

@@ -4,15 +4,10 @@ import { defaultConfig } from '@config/cms.config';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('=== LOGIN API CALLED ===');
-    
     const body = await request.json();
     const { email, password } = body;
-    
-    console.log('Login attempt for:', email);
 
     if (!email || !password) {
-      console.log('Missing email or password');
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
@@ -21,25 +16,30 @@ export async function POST(request: NextRequest) {
 
     const authService = createAuthService(defaultConfig);
     
-    // DEMO CREDENTIALS - Not real secrets, for development only
-    const DEMO_CREDENTIALS = [
-      { email: 'demo.admin@example.test', password: 'demo_admin_pass_123', role: 'admin' as const },
-      { email: 'demo.editor@example.test', password: 'demo_editor_pass_123', role: 'editor' as const },
+    // Demo credentials loaded from environment variables
+    const demoCredentials = [
+      { 
+        email: process.env.DEMO_ADMIN_EMAIL || 'demo.admin@example.test', 
+        password: process.env.DEMO_ADMIN_PASSWORD || 'demo_pass_123', 
+        role: 'admin' as const 
+      },
+      { 
+        email: process.env.DEMO_EDITOR_EMAIL || 'demo.editor@example.test', 
+        password: process.env.DEMO_EDITOR_PASSWORD || 'demo_pass_456', 
+        role: 'editor' as const 
+      },
     ];
 
-    const validUser = DEMO_CREDENTIALS.find(
+    const validUser = demoCredentials.find(
       cred => cred.email === email && cred.password === password
     );
 
     if (!validUser) {
-      console.log('Invalid credentials for:', email);
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
-
-    console.log('Valid user found:', validUser.email, validUser.role);
 
     const user = {
       id: validUser.role === 'admin' ? 'demo-admin-1' : 'demo-editor-1',
@@ -51,8 +51,6 @@ export async function POST(request: NextRequest) {
     };
 
     const token = await authService.generateToken(user);
-    
-    console.log('Demo token generated, sending response');
 
     return NextResponse.json({
       user,
