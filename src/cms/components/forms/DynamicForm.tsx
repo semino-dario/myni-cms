@@ -7,6 +7,7 @@ import TextAreaField from './fields/TextAreaField';
 import BooleanField from './fields/BooleanField';
 import DateField from './fields/DateField';
 import NumberField from './fields/NumberField';
+import MediaField from './fields/MediaField';
 
 interface ContentTypeDefinition {
   name: string;
@@ -165,6 +166,21 @@ export default function DynamicForm({
             error={error}
             required={field.required}
             includeTime={field.type === 'datetime'}
+          />
+        );
+
+      case 'media':
+        return (
+          <MediaField
+            key={field.name}
+            name={field.name}
+            label={field.displayName}
+            value={value}
+            onChange={onChange}
+            error={error}
+            required={field.required}
+            multiple={field.multiple}
+            accept={field.validation?.accept || ['image/*']}
           />
         );
 

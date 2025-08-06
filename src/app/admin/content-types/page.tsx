@@ -1,12 +1,6 @@
-import { getAllContentTypes } from '@config/content-types';
+import { getAllContentTypes } from "@config/content-types";
 
-interface PageProps {
-  params: {
-    slug: string[];
-  };
-}
-
-export default function ContentTypesPage({ params }: PageProps) {
+export default function ContentTypesPage() {
   const contentTypes = getAllContentTypes();
   const contentTypeNames = Object.keys(contentTypes);
 
@@ -14,9 +8,9 @@ export default function ContentTypesPage({ params }: PageProps) {
     <div className="content-types-page">
       <div className="page-header">
         <h1>Content Types</h1>
-        <button className="btn-primary">
+        <a href="/admin/content-types/new" className="btn-primary">
           + New Content Type
-        </button>
+        </a>
       </div>
 
       <div className="content-types-list">
@@ -26,19 +20,19 @@ export default function ContentTypesPage({ params }: PageProps) {
             <div key={name} className="content-type-item">
               <div className="content-type-info">
                 <h3>{contentType.displayName}</h3>
-                <p>{contentType.description || 'No description'}</p>
+                <p>{contentType.description || "No description"}</p>
                 <div className="content-type-meta">
                   <span>Name: {name}</span>
                   <span>Fields: {contentType.fields.length}</span>
                 </div>
               </div>
-              
+
               <div className="content-type-fields">
                 <h4>Fields:</h4>
                 <ul>
                   {contentType.fields.map((field) => (
                     <li key={field.name}>
-                      <strong>{field.displayName}</strong> 
+                      <strong>{field.displayName}</strong>
                       <span className="field-type">({field.type})</span>
                       {field.required && <span className="required">*</span>}
                     </li>

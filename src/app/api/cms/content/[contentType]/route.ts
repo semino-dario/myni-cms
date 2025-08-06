@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContentType } from '@config/content-types';
+import { defaultConfig } from '@config/cms.config';
+import { createDatabaseAdapter } from '@config/database';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     contentType: string;
-  };
+  }>;
 }
 
+// GET /api/cms/content/article - Obtener todos los contenidos de un tipo
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { contentType } = params;
+    const { contentType } = await params;
     
+    // Verificar que el content-type existe
     const contentTypeDefinition = getContentType(contentType);
     if (!contentTypeDefinition) {
       return NextResponse.json(
@@ -19,14 +23,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Mock data por ahora
+    // Por ahora retornamos datos mock, luego conectaremos con la base de datos
     const mockData = [
       {
         id: '1',
         contentType,
         data: {
           title: 'Sample Article',
-          slug: 'sample-article', 
+          slug: 'sample-article',
           content: 'This is a sample article content...',
           published: true,
         },
@@ -49,11 +53,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
+// POST /api/cms/content/article - Crear nuevo contenido
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const { contentType } = params;
+    const { contentType } = await params;
     const body = await request.json();
 
+    // Verificar que el content-type existe
     const contentTypeDefinition = getContentType(contentType);
     if (!contentTypeDefinition) {
       return NextResponse.json(
@@ -62,6 +68,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Validar los datos según el content-type
     if (!body.data) {
       return NextResponse.json(
         { error: 'Content data is required' },
@@ -69,6 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Crear el contenido (mock por ahora)
     const newContent = {
       id: `${Date.now()}`,
       contentType,

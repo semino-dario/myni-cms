@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getContentType } from '@config/content-types';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     contentType: string;
     id: string;
-  };
+  }>;
 }
 
 // GET /api/cms/content/article/123 - Obtener contenido específico
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { contentType, id } = params;
+    const { contentType, id } = await params;
     
     const contentTypeDefinition = getContentType(contentType);
     if (!contentTypeDefinition) {
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         tags: ['sample', 'cms', 'nextjs'],
         featuredImage: null,
       },
-      createdAt: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(), // Random date in last 30 days
+      createdAt: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PUT /api/cms/content/article/123 - Actualizar contenido
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const { contentType, id } = params;
+    const { contentType, id } = await params;
     const body = await request.json();
 
     const contentTypeDefinition = getContentType(contentType);
@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       id,
       contentType,
       data: body.data,
-      createdAt: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/cms/content/article/123 - Eliminar contenido
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const { contentType, id } = params;
+    const { contentType, id } = await params;
 
     const contentTypeDefinition = getContentType(contentType);
     if (!contentTypeDefinition) {
