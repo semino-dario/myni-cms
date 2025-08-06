@@ -52,7 +52,7 @@ export default function LoginPage() {
         <div className="login-container">
           <div className="login-header">
             <h1>Myni CMS</h1>
-            <p>Sign in to your account</p>
+            <p>Demo Login - Development Only</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
@@ -70,7 +70,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Enter demo email"
                 required
                 disabled={loading}
                 autoComplete="off"
@@ -86,7 +86,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="Enter demo password"
                 required
                 disabled={loading}
                 autoComplete="new-password"
@@ -99,32 +99,32 @@ export default function LoginPage() {
               className="login-button"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? 'Signing in...' : 'Demo Sign in'}
             </button>
           </form>
 
           <div className="login-demo">
-            <h3>Quick Demo Login</h3>
+            <h3>Quick Demo Access</h3>
             <div className="demo-accounts">
               <button 
                 type="button"
-                onClick={() => handleDemoLogin('admin@mynicms.com', 'MyniCMS2025!Admin')}
+                onClick={() => handleDemoLogin('demo.admin@example.test', 'demo_admin_pass_123')}
                 className="demo-login-btn admin-btn"
                 disabled={loading}
               >
-                {loading ? 'Logging in...' : 'Login as Admin'}
+                {loading ? 'Logging in...' : 'Demo Admin Login'}
               </button>
               <button 
                 type="button"
-                onClick={() => handleDemoLogin('editor@mynicms.com', 'MyniCMS2025!Editor')}
+                onClick={() => handleDemoLogin('demo.editor@example.test', 'demo_editor_pass_123')}
                 className="demo-login-btn editor-btn"
                 disabled={loading}
               >
-                {loading ? 'Logging in...' : 'Login as Editor'}
+                {loading ? 'Logging in...' : 'Demo Editor Login'}
               </button>
             </div>
             <p className="demo-note">
-              Click the buttons above to login directly without typing credentials
+              <strong>Development Only:</strong> These are demo credentials for testing the CMS functionality.
             </p>
           </div>
         </div>

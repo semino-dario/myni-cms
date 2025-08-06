@@ -4,10 +4,15 @@ import { defaultConfig } from '@config/cms.config';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== LOGIN API CALLED ===');
+    
     const body = await request.json();
     const { email, password } = body;
+    
+    console.log('Login attempt for:', email);
 
     if (!email || !password) {
+      console.log('Missing email or password');
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
@@ -16,40 +21,43 @@ export async function POST(request: NextRequest) {
 
     const authService = createAuthService(defaultConfig);
     
-    // Updated demo credentials with stronger passwords
-    const validCredentials = [
-      { email: 'admin@mynicms.com', password: 'MyniCMS2025!Admin', role: 'admin' as const },
-      { email: 'editor@mynicms.com', password: 'MyniCMS2025!Editor', role: 'editor' as const },
+    // DEMO CREDENTIALS - Not real secrets, for development only
+    const DEMO_CREDENTIALS = [
+      { email: 'demo.admin@example.test', password: 'demo_admin_pass_123', role: 'admin' as const },
+      { email: 'demo.editor@example.test', password: 'demo_editor_pass_123', role: 'editor' as const },
     ];
 
-    const validUser = validCredentials.find(
+    const validUser = DEMO_CREDENTIALS.find(
       cred => cred.email === email && cred.password === password
     );
 
     if (!validUser) {
+      console.log('Invalid credentials for:', email);
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Create user object
+    console.log('Valid user found:', validUser.email, validUser.role);
+
     const user = {
-      id: validUser.role === 'admin' ? 'admin-1' : 'editor-1',
+      id: validUser.role === 'admin' ? 'demo-admin-1' : 'demo-editor-1',
       email: validUser.email,
       role: validUser.role,
-      name: validUser.role === 'admin' ? 'Admin User' : 'Editor User',
+      name: validUser.role === 'admin' ? 'Demo Admin User' : 'Demo Editor User',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    // Generate token
     const token = await authService.generateToken(user);
+    
+    console.log('Demo token generated, sending response');
 
     return NextResponse.json({
       user,
       token,
-      message: 'Login successful'
+      message: 'Demo login successful'
     });
 
   } catch (error) {
