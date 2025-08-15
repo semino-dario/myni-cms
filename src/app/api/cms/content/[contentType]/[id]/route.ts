@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContentType } from '@config/content-types';
+import { defaultConfig } from '@config/cms.config';
+import { createDatabaseAdapter } from '@config/database';
 
 interface RouteParams {
   params: Promise<{
@@ -21,25 +23,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Mock data por ahora - simulamos contenido diferente según el ID
-    const mockContent = {
-      id,
-      contentType,
-      data: {
-        title: id === '1' ? 'Sample Article' : `Another Article ${id}`,
-        slug: id === '1' ? 'sample-article' : `article-${id}`,
-        excerpt: `This is an excerpt for article ${id}`,
-        content: `This is the full content for ${contentType} with ID ${id}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-        published: id === '1' ? true : false,
-        publishedAt: new Date().toISOString(),
-        tags: ['sample', 'cms', 'nextjs'],
-        featuredImage: null,
-      },
-      createdAt: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    const dbAdapter = createDatabaseAdapter(defaultConfig);
+    const content = await dbAdapter.findOne(contentType, { id });
 
-    return NextResponse.json({ item: mockContent });
+    if (!content) {
+      return NextResponse.json(
+        { error: 'Content not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ item: content });
   } catch (error) {
     console.error('Error fetching content:', error);
     return NextResponse.json(
@@ -70,16 +64,21 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Mock update
-    const updatedContent = {
-      id,
-      contentType,
-      data: body.data,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    // Validar campos requeridos
+    const missingFields = contentTypeDefinition.fields
+      .filter(field => field.required)
+      .filter(field => !body.data[field.name] && body.data[field.name] !== false)
+      .map(field => field.displayName);
 
-    console.log('Updating content:', updatedContent);
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    const dbAdapter = createDatabaseAdapter(defaultConfig);
+    const updatedContent = await dbAdapter.updateOne(contentType, { id }, body.data);
 
     return NextResponse.json({ 
       item: updatedContent,
@@ -87,6 +86,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Error updating content:', error);
+    
+    if (error instanceof Error && error.message.includes('not found')) {
+      return NextResponse.json(
+        { error: 'Content not found' },
+        { status: 404 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -107,7 +114,15 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    console.log('Deleting content:', { contentType, id });
+    const dbAdapter = createDatabaseAdapter(defaultConfig);
+    const deleted = await dbAdapter.deleteOne(contentType, { id });
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: 'Content not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ 
       message: 'Content deleted successfully',

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import DynamicForm from '@cms/components/forms/DynamicForm';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import DynamicForm from "@cms/components/forms/DynamicForm";
 
 interface ContentTypeDefinition {
   name: string;
@@ -15,8 +15,9 @@ export default function NewContentPage() {
   const params = useParams();
   const router = useRouter();
   const contentType = params.contentType as string;
-  
-  const [contentTypeDefinition, setContentTypeDefinition] = useState<ContentTypeDefinition | null>(null);
+
+  const [contentTypeDefinition, setContentTypeDefinition] =
+    useState<ContentTypeDefinition | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +29,16 @@ export default function NewContentPage() {
   const fetchContentType = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/cms/content-types?name=${contentType}`);
+      const response = await fetch(
+        `/api/cms/content-types?name=${contentType}`
+      );
       if (!response.ok) {
-        throw new Error('Content type not found');
+        throw new Error("Content type not found");
       }
       const data = await response.json();
       setContentTypeDefinition(data.contentType);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -47,21 +50,21 @@ export default function NewContentPage() {
       setError(null);
 
       const response = await fetch(`/api/cms/content/${contentType}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ data: formData }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create content');
+        throw new Error("Failed to create content");
       }
 
       // Redirect back to content list
       router.push(`/admin/content/${contentType}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save content');
+      setError(err instanceof Error ? err.message : "Failed to save content");
     } finally {
       setSaving(false);
     }
@@ -98,10 +101,7 @@ export default function NewContentPage() {
           <h1>New {contentTypeDefinition.displayName}</h1>
           <p>Create a new {contentTypeDefinition.displayName.toLowerCase()}</p>
         </div>
-        <button 
-          onClick={() => router.back()} 
-          className="btn-secondary"
-        >
+        <button onClick={() => router.back()} className="btn-secondary">
           Cancel
         </button>
       </div>

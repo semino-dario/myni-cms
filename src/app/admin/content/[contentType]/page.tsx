@@ -28,8 +28,7 @@ export default function ContentManagePage() {
   const params = useParams();
   const contentType = params.contentType as string;
   
-  const [allItems, setAllItems] = useState<ContentItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<ContentItem[]>([]);
+  const [items, setItems] = useState<ContentItem[]>([]);
   const [contentTypeDefinition, setContentTypeDefinition] = useState<ContentTypeDefinition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,29 +41,38 @@ export default function ContentManagePage() {
 
   useEffect(() => {
     fetchContent();
-  }, [contentType]);
-
-  useEffect(() => {
-    applyFiltersAndSearch();
-  }, [allItems, searchQuery, filters, sortField, sortDirection]);
+  }, [contentType, searchQuery, filters, sortField, sortDirection]);
 
   const fetchContent = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/cms/content/${contentType}`);
+      // Construir URL con parámetros de búsqueda
+      const searchParams = new URLSearchParams();
+      
+      if (searchQuery) searchParams.set('search', searchQuery);
+      if (sortField) searchParams.set('sortField', sortField);
+      if (sortDirection) searchParams.set('sortDirection', sortDirection);
+      
+      // Agregar filtros
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          searchParams.set(`filter_${key}`, value);
+        }
+      });
+
+      const url = `/api/cms/content/${contentType}?${searchParams.toString()}`;
+      const response = await fetch(url);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch content');
       }
 
       const data = await response.json();
-      
-      // Generate more mock data for testing search/filters
-      const mockItems = generateMockData(data.contentType);
-      
-      setAllItems(mockItems);
+      setItems(data.items || []);
       setContentTypeDefinition(data.contentType);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -72,107 +80,17 @@ export default function ContentManagePage() {
     }
   };
 
-  const generateMockData = (contentTypeDef: ContentTypeDefinition): ContentItem[] => {
-    const mockItems: ContentItem[] = [];
-    
-    for (let i = 1; i <= 15; i++) {
-      const randomDate = new Date(Date.now() - Math.random() * 86400000 * 30);
-      mockItems.push({
-        id: i.toString(),
-        contentType,
-        data: {
-          title: `${contentTypeDef.displayName} ${i}`,
-          slug: `${contentType}-${i}`,
-          excerpt: `This is an excerpt for ${contentType} ${i}. Content number ${i}.`,
-          content: `Full content for ${contentType} ${i}. This is sample content with keywords and descriptions.`,
-          published: Math.random() > 0.5,
-          publishedAt: randomDate.toISOString(),
-          tags: ['sample', 'demo', i % 2 === 0 ? 'even' : 'odd', `tag-${i}`],
-          featuredImage: i % 3 === 0 ? `/images/sample-${i}.jpg` : null,
-        },
-        createdAt: randomDate.toISOString(),
-        updatedAt: new Date(randomDate.getTime() + Math.random() * 86400000).toISOString(),
-      });
-    }
-    
-    return mockItems;
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
-  const applyFiltersAndSearch = () => {
-    let filtered = [...allItems];
+  const handleFilter = (newFilters: Record<string, any>) => {
+    setFilters(newFilters);
+  };
 
-    // Apply search - MEJORADO para buscar en más campos
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      
-      filtered = filtered.filter(item => {
-        // Buscar en todos los campos de texto del item
-        const searchableFields = [];
-        
-        // Agregar campos específicos que sabemos que existen
-        if (item.data.title) searchableFields.push(item.data.title);
-        if (item.data.slug) searchableFields.push(item.data.slug);
-        if (item.data.excerpt) searchableFields.push(item.data.excerpt);
-        if (item.data.content) searchableFields.push(item.data.content);
-        
-        // Agregar tags si es un array
-        if (Array.isArray(item.data.tags)) {
-          searchableFields.push(...item.data.tags);
-        }
-        
-        // Agregar el ID del item también
-        searchableFields.push(item.id);
-        
-        // Buscar en todos los campos string/number del content-type
-        contentTypeDefinition?.fields.forEach(field => {
-          const value = item.data[field.name];
-          if (value && (typeof value === 'string' || typeof value === 'number')) {
-            searchableFields.push(value.toString());
-          }
-        });
-        
-        // Unir todo el texto y buscar
-        const searchableText = searchableFields.join(' ').toLowerCase();
-        
-        return searchableText.includes(query);
-      });
-    }
-
-    // Apply filters
-    Object.entries(filters).forEach(([field, value]) => {
-      if (field === 'createdAfter' && value) {
-        filtered = filtered.filter(item => new Date(item.createdAt) >= new Date(value));
-      } else if (field === 'createdBefore' && value) {
-        filtered = filtered.filter(item => new Date(item.createdAt) <= new Date(value));
-      } else if (value !== '' && value !== null && value !== undefined) {
-        filtered = filtered.filter(item => {
-          const itemValue = item.data[field];
-          if (typeof itemValue === 'boolean') {
-            return itemValue.toString() === value;
-          }
-          return itemValue === value;
-        });
-      }
-    });
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let aValue, bValue;
-      
-      if (sortField === 'createdAt' || sortField === 'updatedAt') {
-        aValue = new Date(a[sortField]).getTime();
-        bValue = new Date(b[sortField]).getTime();
-      } else {
-        aValue = a.data[sortField];
-        bValue = b.data[sortField];
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredItems(filtered);
+  const handleSort = (field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
   };
 
   const handleDelete = async (id: string) => {
@@ -189,8 +107,8 @@ export default function ContentManagePage() {
         throw new Error('Failed to delete item');
       }
 
-      // Remove from local state
-      setAllItems(prev => prev.filter(item => item.id !== id));
+      // Refresh the list
+      fetchContent();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete item');
     }
@@ -233,12 +151,9 @@ export default function ContentManagePage() {
       </div>
 
       <SearchAndFilters
-        onSearch={setSearchQuery}
-        onFilter={setFilters}
-        onSort={(field, direction) => {
-          setSortField(field);
-          setSortDirection(direction);
-        }}
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        onSort={handleSort}
         contentType={contentTypeDefinition}
         searchQuery={searchQuery}
         sortField={sortField}
@@ -247,25 +162,20 @@ export default function ContentManagePage() {
 
       <div className="content-stats">
         <div className="stat-item">
-          <span className="stat-number">{filteredItems.length}</span>
-          <span className="stat-label">
-            {filteredItems.length === allItems.length ? 'Total Items' : `of ${allItems.length} items`}
-          </span>
+          <span className="stat-number">{items.length}</span>
+          <span className="stat-label">Items Found</span>
         </div>
         {searchQuery && (
           <div className="search-info">
             Searching for: <strong>"{searchQuery}"</strong>
-            <small style={{ marginLeft: '0.5rem', opacity: 0.7 }}>
-              (searches in title, slug, content, tags, and ID)
-            </small>
           </div>
         )}
       </div>
 
       <div className="content-table">
-        {filteredItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="empty-state">
-            {allItems.length === 0 ? (
+            {!searchQuery && Object.keys(filters).length === 0 ? (
               <>
                 <h3>No content found</h3>
                 <p>Create your first {contentTypeDefinition.displayName.toLowerCase()} to get started.</p>
@@ -276,7 +186,7 @@ export default function ContentManagePage() {
             ) : (
               <>
                 <h3>No matching results</h3>
-                <p>Try adjusting your search or filters. Searched in: title, slug, content, tags, and ID.</p>
+                <p>Try adjusting your search or filters.</p>
               </>
             )}
           </div>
@@ -298,14 +208,14 @@ export default function ContentManagePage() {
               </tr>
             </thead>
             <tbody>
-              {filteredItems.map((item) => (
+              {items.map((item) => (
                 <tr key={item.id}>
                   <td>
                     <strong>{item.data.title || `Item ${item.id}`}</strong>
                   </td>
                   <td>
                     <code style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      {item.data.slug}
+                      {item.data.slug || '-'}
                     </code>
                   </td>
                   {contentTypeDefinition.fields
